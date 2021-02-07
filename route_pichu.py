@@ -18,7 +18,7 @@ def parse_map(filename):
 # Return a string with the board rendered in a human/pichu-readable format
 def printable_board(board):
     return "\n".join([ "".join(row) for row in board])
-                
+
 # Check if a row,col index pair is on the map
 def valid_index(pos, n, m):
         return 0 <= pos[0] < n  and 0 <= pos[1] < m
@@ -40,18 +40,46 @@ def moves(map, row, col):
 # - move_string is a string indicating the path, consisting of U, L, R, and D characters
 #    (for up, left, right, and down)
 #
+def findroute(previous_move, curr_move, route):
+    if(previous_move[0] == curr_move[0]):
+        if(previous_move[1] -1 == curr_move[1]):
+            return route + "L"
+        elif(previous_move[1] +1 == curr_move[1]):
+            return route + "R"
+
+    elif(previous_move[1] == curr_move[1]):
+        if (previous_move[0] - 1 == curr_move[0]):
+            return route + "U"
+        elif (previous_move[0] + 1 == curr_move[0]):
+            return route + "D"
+
+
+
 def search(house_map):
         # Find pichu start position
         pichu_loc=[(row_i,col_i) for col_i in range(len(house_map[0])) for row_i in range(len(house_map)) if house_map[row_i][col_i]=="p"][0]
-        fringe=[(pichu_loc,0)]
+
+        fringe=[(pichu_loc,0,"")]
+        visited = []
+         #visited.add()
 
         while fringe:
-                (curr_move, curr_dist)=fringe.pop()
+                (curr_move, curr_dist,route)=fringe.pop()
+                visited.append(curr_move)
+                # if curr_move not in visited:
+                #         visited.add(curr_move)
+                print("Current Move",curr_move)
                 for move in moves(house_map, *curr_move):
+
+
+
                         if house_map[move[0]][move[1]]=="@":
-                                return (7, "DDDDDDD")  # return a dummy answer
+                                return (curr_dist+1, findroute(curr_move,move,route))  # return a dummy answer
                         else:
-                                fringe.append((move, curr_dist + 1))
+                                if move not in visited:
+                                        #print("new func "+ findroute(previous_move,curr_move,route))
+                                        fringe.append((move, curr_dist + 1,findroute(curr_move,move,route)))
+
 
 # Main Function
 if __name__ == "__main__":
@@ -60,5 +88,9 @@ if __name__ == "__main__":
         print("Shhhh... quiet while I navigate!")
         solution = search(house_map)
         print("Here's the solution I found:")
-        print(str(solution[0]) + " " + str(solution[1]))
+        if solution:
+            print(str(solution[0]) + " " + str(solution[1]))
+        else:
+            print(-1)
+            exit(-1)
 

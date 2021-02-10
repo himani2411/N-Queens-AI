@@ -33,8 +33,11 @@ def add_pichu(board, row, col):
     # print ("Add Pichu 1st part",board[0:row] )
     # print ("Add Pichu 2nd part",[board[row][0:col] + ['p',] + board[row][col+1:]] )
     # print ("add 3rdpart ",board[row+1:])
-
-    return board[0:row] + [board[row][0:col] + ['p', ] + board[row][col + 1:]] + board[row + 1:]
+    s = safe_to_place_pichus_in_rows_cols(board, row, col)
+    if (s == 0):
+        return board[0:row] + [board[row][0:col] + ['p', ] + board[row][col + 1:]] + board[row + 1:]
+    else:
+        return board
 
 
 def safe_to_place_pichus_in_rows_cols(board, row, col):
@@ -42,14 +45,41 @@ def safe_to_place_pichus_in_rows_cols(board, row, col):
     #         count_rowWise= 0
     #         count_colWise = 0
 
-    for i in range(len(board[0])):
-        if board[row][i] == '.' and board[row][i + 1] == 'X':
-            return add_pichu(board, row, i)
+    countinRowfromStart = 0
+    countInaRowTillEnd = 0
 
-        # check for pichus in a row
-        # for j in range(len(sol)+1):
-        #     if sol[j][col] == '.' and sol[j+1][col]=='X':
-        #         sol = sol + add_pichu(sol, j, col)
+    countColfromStart = 0
+    countColTillEnd = 0
+
+    #Keeping row same and checking till the Column value given
+    for i in range(0,col,1):
+        if board[row][i] == '@' or board[row][i] == 'X':
+            countinRowfromStart = 0
+        if board[row][i] == 'p':
+            countinRowfromStart = 1
+
+    #Keeping the row same and checking the column from given value till end
+    for j in range(len(board[0])-1,col,-1):
+        if board[row][j] == '@' or board[row][j] == 'X':
+            countInaRowTillEnd = 0
+        if board[row][j] == 'p':
+            countInaRowTillEnd = 1
+
+    # Keeping the Column same and checking the Column from 0 to given value
+    for k in range(0, row, 1):
+            if board[k][col] == '@' or board[k][col] == 'X':
+                countColfromStart = 0
+            if board[k][col] == 'p':
+                countColfromStart = 1
+
+    # Keeping the Column same and checking the columns from 0 to given value
+    for l in range( len(board)-1,row,-1):
+        if board[l][col] == '@' or board[l][col] == 'X':
+            countColTillEnd = 0
+        if board[l][col] == 'p':
+            countColTillEnd = 1
+
+    return countinRowfromStart + countInaRowTillEnd + countColfromStart + countColTillEnd
 
 
 def safe_to_place_diagoally(board, row, col):
@@ -86,82 +116,81 @@ def safe_to_place_diagoally(board, row, col):
 
 # Get list of successors of given board state
 def successors(board):
-    # return [ add_pichu(board, r, c) for r in range(0, len(board)) for c in range(0,len(board[0])) if  board[r][c] == '.' and safe_to_place(board, r,c )]
-    return [safe_to_placeColwise(board, r, c) for r in range(0, len(board)) for c in range(0, len(board[0])) if
-            board[r][c] == '.']
+
+    return [add_pichu(board, r, c) for r in range(0, len(board)) for c in range(0, len(board[0])) if board[r][c] == '.']
 
 
 # check if board is a goal state
 def is_goal(board, k):
     return count_pichus(board) == k
 
-
-def safe_to_place(board, row, col):
-    # loop for rows of matrix
-    # newboard = board
-    for i in range(0, len(board)):
-
-        # loop for column of matrix
-        for j in range(0, len(board[i]) + 1):
-
-            # loop for comparison and swapping
-            for k in range(len(board[i]) - j - 1):
-
-                if (board[i][k] == '.' and board[i][k + 1] == 'X'):
-                    #     return False
-                    # if (board[i][j] =='.' and board[i][j+1] == 'X'):
-                    # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
-                    # return add_pichu(board, i, k)
-                    # if (board[k][i] == '.' and board[k+1][i] == 'X'):
-                    print("safe to place board\n", printable_board(add_pichu(board, i, k)))
-                    return add_pichu(board, i, k)
-
-#Test for all the rows and columns of all the boards. So all nodes.
-def safe_to_placeColwise(board, row, col):
-    # loop for rows of matrix
-    # newboard = board
-    flagOne = 0
-    flagTwo = 0
-    for i in range(0, len(board)):
-
-        # loop for column of matrix
-        for j in range(0, len(board[0]) + 1):
-
-            # loop for comparison and swapping
-            for k in range(len(board[0]) - j - 1):
-
-                if (board[i][k] == '.' and board[i][k + 1] == 'X'):
-
-                    # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
-                    flagOne = 1
-
-                    for l in range(0, len(board)):
-
-                        # loop for column of matrix
-                        for m in range(0, len(board[0]) + 1):
-
-                            # loop for comparison and swapping
-                            for n in range(len(board[0]) - j - 1):
-
-                                if (board[n][l] == '.' and board[l][k + 1] == 'X'):
-                                    # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
-                                    flagTwo = 1
-                                    # add_pichu(board, i, k)
-                                    print("safe to place board\n", printable_board(add_pichu(board, i, k)))
-
-
-
-#Test for all the rows and columns of all the boards. So all nodes.
-def safe_to_place2(board, row, col):
-    # loop for rows of board
-    # newboard = board
-    for r in range(0, len(board)):
-
-        # loop for column of matrix
-        for c in range(0, len(board[0])):
-            if (board[r][c] == "X"):
-                add_pichu(board, r, c)
-        # loop for comparison and swapping
+#
+# def safe_to_place(board, row, col):
+#     # loop for rows of matrix
+#     # newboard = board
+#     for i in range(0, len(board)):
+#
+#         # loop for column of matrix
+#         for j in range(0, len(board[i]) + 1):
+#
+#             # loop for comparison and swapping
+#             for k in range(len(board[i]) - j - 1):
+#
+#                 if (board[i][k] == '.' and board[i][k + 1] == 'X'):
+#                     #     return False
+#                     # if (board[i][j] =='.' and board[i][j+1] == 'X'):
+#                     # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
+#                     # return add_pichu(board, i, k)
+#                     # if (board[k][i] == '.' and board[k+1][i] == 'X'):
+#                     print("safe to place board\n", printable_board(add_pichu(board, i, k)))
+#                     return add_pichu(board, i, k)
+#
+# #Test for all the rows and columns of all the boards. So all nodes.
+# def safe_to_placeColwise(board, row, col):
+#     # loop for rows of matrix
+#     # newboard = board
+#     flagOne = 0
+#     flagTwo = 0
+#     for i in range(0, len(board)):
+#
+#         # loop for column of matrix
+#         for j in range(0, len(board[0]) + 1):
+#
+#             # loop for comparison and swapping
+#             for k in range(len(board[0]) - j - 1):
+#
+#                 if (board[i][k] == '.' and board[i][k + 1] == 'X'):
+#
+#                     # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
+#                     flagOne = 1
+#
+#                     for l in range(0, len(board)):
+#
+#                         # loop for column of matrix
+#                         for m in range(0, len(board[0]) + 1):
+#
+#                             # loop for comparison and swapping
+#                             for n in range(len(board[0]) - j - 1):
+#
+#                                 if (board[n][l] == '.' and board[l][k + 1] == 'X'):
+#                                     # print("safe to place board\n", printable_board(add_pichu(board, i, k)))
+#                                     flagTwo = 1
+#                                     # add_pichu(board, i, k)
+#                                     print("safe to place board\n", printable_board(add_pichu(board, i, k)))
+#
+#
+#
+# #Test for all the rows and columns of all the boards. So all nodes.
+# def safe_to_place2(board, row, col):
+#     # loop for rows of board
+#     # newboard = board
+#     for r in range(0, len(board)):
+#
+#         # loop for column of matrix
+#         for c in range(0, len(board[0])):
+#             if (board[r][c] == "X"):
+#                 add_pichu(board, r, c)
+#         # loop for comparison and swapping
 
 
 # Arrange agents on the map
@@ -173,11 +202,15 @@ def safe_to_place2(board, row, col):
 #
 def solve(initial_board, k):
     fringe = [initial_board]
+    visited = []
     while len(fringe) > 0:
         for s in successors(fringe.pop()):
             if is_goal(s, k):
                 return (s, True)
-            fringe.append(s)
+            else:
+                if s not in visited:
+                    visited.append(s)
+                    fringe.append(s)
     return ([], False)
 
 
@@ -188,14 +221,15 @@ if __name__ == "__main__":
     # This is K, the number of agents
     k = int(sys.argv[2])
     print(house_map, "Starting from initial board:\n" + printable_board(house_map) + "\n\nLooking for solution...\n")
-    # print("safe ","\n",printable_board( safe_to_place_pichus_in_rows_cols(house_map,0,0)))
+    #print("safe ","\n",printable_board( add_pichu(house_map,0,0)))
 
     # for r in range(0, len(house_map)):
     #     for c in range(0, len(house_map[0])):
     #         safe_to_place_diagonally(house_map, r, c)
     (newboard, success) = solve(house_map, k)
-    if success:
-        print("Here's what we found:")
-        print(printable_board(newboard) if success else "None")
-    else:
-        print(success)
+    print(printable_board(newboard) if success else "None")
+    # if success:
+    #     print("Here's what we found:")
+
+    # else:
+    #     print(success)

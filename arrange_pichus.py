@@ -28,17 +28,22 @@ def printable_board(board):
 
 
 # Add a pichu to the board at the given position, and return a new board (doesn't change original)
-def add_pichu(board, row, col):
+def add_pichu(board, row, col, diagonalFlag):
     # print("row ", row, "column ", col)
     # print ("Add Pichu 1st part",board[0:row] )
     # print ("Add Pichu 2nd part",[board[row][0:col] + ['p',] + board[row][col+1:]] )
     # print ("add 3rdpart ",board[row+1:])
-    s = safe_to_place_pichus_in_rows_cols(board, row, col)
-    if (s == 0):
+    checkCostForDiag = 0
+    if diagonalFlag == 1:
+        checkCostForDiag = safe_to_place_diagoally(board, row, col)
+
+    if checkCostForDiag == 0:
+        checkcostforrowCol = safe_to_place_pichus_in_rows_cols(board, row, col)
+
+    if (checkcostforrowCol + checkCostForDiag == 0):
         return board[0:row] + [board[row][0:col] + ['p', ] + board[row][col + 1:]] + board[row + 1:]
     else:
         return board
-
 
 def safe_to_place_pichus_in_rows_cols(board, row, col):
     # check for pichus in a col and then inside rows
@@ -51,15 +56,15 @@ def safe_to_place_pichus_in_rows_cols(board, row, col):
     countColfromStart = 0
     countColTillEnd = 0
 
-    #Keeping row same and checking till the Column value given
-    for i in range(0,col,1):
+    # Keeping row same and checking till the Column value given
+    for i in range(0, col, 1):
         if board[row][i] == '@' or board[row][i] == 'X':
             countinRowfromStart = 0
         if board[row][i] == 'p':
             countinRowfromStart = 1
 
-    #Keeping the row same and checking the column from given value till end
-    for j in range(len(board[0])-1,col,-1):
+    # Keeping the row same and checking the column from given value till end
+    for j in range(len(board[0]) - 1, col, -1):
         if board[row][j] == '@' or board[row][j] == 'X':
             countInaRowTillEnd = 0
         if board[row][j] == 'p':
@@ -67,13 +72,13 @@ def safe_to_place_pichus_in_rows_cols(board, row, col):
 
     # Keeping the Column same and checking the Column from 0 to given value
     for k in range(0, row, 1):
-            if board[k][col] == '@' or board[k][col] == 'X':
-                countColfromStart = 0
-            if board[k][col] == 'p':
-                countColfromStart = 1
+        if board[k][col] == '@' or board[k][col] == 'X':
+            countColfromStart = 0
+        if board[k][col] == 'p':
+            countColfromStart = 1
 
     # Keeping the Column same and checking the columns from 0 to given value
-    for l in range( len(board)-1,row,-1):
+    for l in range(len(board) - 1, row, -1):
         if board[l][col] == '@' or board[l][col] == 'X':
             countColTillEnd = 0
         if board[l][col] == 'p':
@@ -83,46 +88,57 @@ def safe_to_place_pichus_in_rows_cols(board, row, col):
 
 
 def safe_to_place_diagoally(board, row, col):
+    checkfortopDiagForw = 0
+    checkfortopDiagback = 0
+    checkfordownDiagback = 0
+    checkfordownDiagForw = 0
+
     # This works for forward Movement of top left to bottom right
-    for i, j in zip(range(row, len(board), 1),
-                    range(col, len(board[0]), 1)):
+    for i, j in zip(range(row + 1, len(board), 1),
+                    range(col + 1 , len(board[0]), 1)):
         print(" row ", i, "column", j)
-        if board[row][j] == 'p':
-            checkforPichufortopDiag = 1
-        if board[row][j] == 'X' or board[row][j] == '@':
-            checkforXfortopDiag = 0
-            print("X location diagonally in left to right diagonal -- row ", i, "column", j)
-            #     return False
+        if board[i][j] == 'p':
+            checkfortopDiagForw = 1
+        if board[i][j] == 'X' or board[i][j] == '@':
+            checkfortopDiagForw = 0
 
     # This works for backward Movement of top left to bottom right
-    for i, j in zip(range(row, -1, -1),
-                    range(col, -1, -1)):
-        print("X location diagonally in left to right diagonal -- row ", i, "column", j)
+    for i, j in zip(range(row -1 , -1, -1),
+                    range(col -1, -1, -1)):
+        if board[row][j] == 'p':
+            checkfortopDiagback = 1
+        if board[row][j] == 'X' or board[row][j] == '@':
+            checkfortopDiagback = 0
 
     # This Code works for backward movement of bottom left to top right
-    for i, j in zip(range(row, len(board), 1),
-                    range(col, -1, -1)):
-        print("X location diagonally in right  to left diagonal -- row ", i, "column", j)
-        # if board[i][j] == 'p':
-        #     return False
+    for i, j in zip(range(row + 1, len(board), 1),
+                    range(col - 1, -1, -1)):
+        if board[i][j] == 'p':
+            checkfordownDiagback = 1
+        if board[i][j] == 'X' or board[i][j] == '@':
+            checkfordownDiagback = 0
 
     # This Code works for forward movement of bottom left to top right
-    for i, j in zip(range(row, -1, -1),
-                    range(col, len(board[0]) + 1, 1)):
-        print("X location diagonally in right  to left diagonal -- row ", i, "column", j)
+    for i, j in zip(range(row - 1, -1, -1),
+                    range(col + 1, len(board[0]), 1)):
+        if board[i][j] == 'p':
+            checkfordownDiagForw = 1
+        if board[i][j] == 'X' or board[i][j] == '@':
+            checkfordownDiagForw = 0
 
-
+    return checkfortopDiagback + checkfortopDiagForw + checkfordownDiagForw + checkfordownDiagback
 
 
 # Get list of successors of given board state
-def successors(board):
-
-    return [add_pichu(board, r, c) for r in range(0, len(board)) for c in range(0, len(board[0])) if board[r][c] == '.']
+def successors(board, diagonalFlag):
+    return [add_pichu(board, r, c, diagonalFlag) for r in range(0, len(board)) for c in range(0, len(board[0])) if
+            board[r][c] == '.']
 
 
 # check if board is a goal state
 def is_goal(board, k):
     return count_pichus(board) == k
+
 
 #
 # def safe_to_place(board, row, col):
@@ -201,16 +217,32 @@ def is_goal(board, k):
 # - success is True if a solution was found, and False otherwise.
 #
 def solve(initial_board, k):
+    diagonalFlag = 0
     fringe = [initial_board]
     visited = []
-    while len(fringe) > 0:
-        for s in successors(fringe.pop()):
-            if is_goal(s, k):
-                return (s, True)
-            else:
-                if s not in visited:
-                    visited.append(s)
-                    fringe.append(s)
+    if k == 0:
+        diagonalFlag = 1
+        while k >= 0:
+
+            while len(fringe) > 0:
+                for s in successors(fringe.pop(), diagonalFlag):
+                    if is_goal(s, k):
+                        print("maximum k is ", k)
+                        return (s, True)
+                    else:
+                        if s not in visited:
+                            visited.append(s)
+                            fringe.append(s)
+                k = k + 1
+    else:
+        while len(fringe) > 0:
+            for s in successors(fringe.pop(),diagonalFlag):
+                if is_goal(s, k):
+                    return (s, True)
+                else:
+                    if s not in visited:
+                        visited.append(s)
+                        fringe.append(s)
     return ([], False)
 
 
@@ -221,7 +253,7 @@ if __name__ == "__main__":
     # This is K, the number of agents
     k = int(sys.argv[2])
     print(house_map, "Starting from initial board:\n" + printable_board(house_map) + "\n\nLooking for solution...\n")
-    #print("safe ","\n",printable_board( add_pichu(house_map,0,0)))
+    # print("safe ","\n",printable_board( add_pichu(house_map,0,0)))
 
     # for r in range(0, len(house_map)):
     #     for c in range(0, len(house_map[0])):

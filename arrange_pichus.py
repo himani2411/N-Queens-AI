@@ -34,10 +34,11 @@ def add_pichu(board, row, col, diagonalFlag):
     # print ("Add Pichu 2nd part",[board[row][0:col] + ['p',] + board[row][col+1:]] )
     # print ("add 3rdpart ",board[row+1:])
     checkCostForDiag = 0
+    checkcostforrowCol = 0
     if diagonalFlag == 1:
         checkCostForDiag = safe_to_place_diagoally(board, row, col)
 
-    if checkCostForDiag == 0:
+    if checkCostForDiag == 0: #No need to check if refused by digonal checks
         checkcostforrowCol = safe_to_place_pichus_in_rows_cols(board, row, col)
 
     if (checkcostforrowCol + checkCostForDiag == 0):
